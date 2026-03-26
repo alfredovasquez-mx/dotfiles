@@ -2,8 +2,11 @@
 *
 !.gitignore
 !README.md
+!Makefile
 !fish/
 !fish/**
+!gh/
+!gh/config.yml
 !ghostty/
 !ghostty/**
 !git/
@@ -12,6 +15,8 @@
 !nvim/**
 !opencode/
 !opencode/**
+!scripts/
+!scripts/**
 !tmux/
 !tmux/**
 !starship.toml
@@ -22,6 +27,7 @@ fish/fish_variables
 fish/completions/
 fish/conf.d/00_fig_pre.fish
 fish/conf.d/99_fig_post.fish
+gh/hosts.yml
 ghostty/config.backup-*
 tmux/plugins/
 opencode/node_modules/
