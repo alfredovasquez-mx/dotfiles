@@ -1,0 +1,38 @@
+# Theme
+theme = "Kanagawa Dragon"
+
+# Glass effect (macOS)
+background-opacity = 0.88
+#background-blur = macos-glass-clear
+background-blur = 8
+background-opacity-cells = false
+
+#macos-titlebar-style = hidden
+macos-window-buttons = hidden
+
+# Font
+font-size = 17
+font-thicken = false
+font-thicken-strength = 0
+font-family = "JetBrainsMono Nerd Font"
+
+adjust-cell-height = 1
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+cursor-opacity = 0.9
+custom-shader = shaders/cursor.glsl
+
+
+# UI behavior
+mouse-hide-while-typing = true
+#macos-option-as-alt = true
+
+# Window behavior
+window-save-state = always
+#window-decoration = false
+
+# Performace
+alpha-blending = native
+window-vsync = true

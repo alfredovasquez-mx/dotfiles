@@ -1,0 +1,8 @@
+[include]
+  path = ~/.config/git/common.gitconfig
+
+[includeIf "gitdir:~/dev/work/**/.git"]
+  path = ~/.config/git/work.gitconfig
+
+[includeIf "gitdir:~/dev/personal/**/.git"]
+  path = ~/.config/git/personal.gitconfig

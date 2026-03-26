@@ -1,0 +1,4 @@
+# ~/.config/git/personal.gitconfig
+[user]
+  name = Alfredo Omar Vásquez López
+  email = alfredo.vasquez.mx@gmail.com

@@ -1,0 +1,13 @@
+# ~/.config/git/common.gitconfig
+[core]
+  editor = nvim
+
+[pull]
+  rebase = false
+
+[init]
+  defaultBranch = main
+
+[user]
+  name = Alfredo Omar Vásquez López
+  email = alfredo.vasquez.mx@gmail.com

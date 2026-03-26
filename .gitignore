@@ -1,0 +1,29 @@
+# Track only curated dotfiles from this config root.
+*
+!.gitignore
+!README.md
+!fish/
+!fish/**
+!ghostty/
+!ghostty/**
+!git/
+!git/**
+!nvim/
+!nvim/**
+!opencode/
+!opencode/**
+!tmux/
+!tmux/**
+!starship.toml
+
+# Generated or machine-local files
+.DS_Store
+fish/fish_variables
+fish/conf.d/00_fig_pre.fish
+fish/conf.d/99_fig_post.fish
+ghostty/config.backup-*
+tmux/plugins/
+opencode/node_modules/
+nvim/.git
+nvim/.gitignore
+opencode/.gitignore
