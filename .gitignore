@@ -19,6 +19,7 @@
 # Generated or machine-local files
 .DS_Store
 fish/fish_variables
+fish/completions/
 fish/conf.d/00_fig_pre.fish
 fish/conf.d/99_fig_post.fish
 ghostty/config.backup-*
