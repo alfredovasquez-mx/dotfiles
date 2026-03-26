@@ -31,6 +31,7 @@ make bootstrap-macos
 
 Useful targets:
 
+- `make brew-bundle`
 - `make links`
 - `make tmux-plugins`
 - `make opencode-deps`

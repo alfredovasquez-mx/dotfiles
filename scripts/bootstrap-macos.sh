@@ -3,25 +3,6 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-BREW_FORMULAE=(
-  fish
-  gh
-  tmux
-  neovim
-  starship
-  fzf
-  fd
-  ripgrep
-  lazygit
-  shfmt
-  stylua
-  bun
-)
-
-BREW_CASKS=(
-  ghostty
-)
-
 ensure_homebrew() {
   if command -v brew >/dev/null 2>&1; then
     return
@@ -29,14 +10,6 @@ ensure_homebrew() {
 
   echo "Homebrew is not installed. Installing..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-}
-
-install_brew_packages() {
-  echo "Installing Homebrew formulae..."
-  brew install "${BREW_FORMULAE[@]}"
-
-  echo "Installing Homebrew casks..."
-  brew install --cask "${BREW_CASKS[@]}"
 }
 
 run_script() {
@@ -49,7 +22,7 @@ main() {
   ensure_homebrew
   eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || brew shellenv)"
   brew update
-  install_brew_packages
+  brew bundle --file "${ROOT}/Brewfile"
   run_script "install-home-links.sh"
   run_script "install-tmux-plugins.sh"
   run_script "install-opencode-deps.sh"

@@ -1,9 +1,12 @@
 SHELL := /bin/bash
 
-.PHONY: bootstrap-macos links tmux-plugins opencode-deps doctor
+.PHONY: bootstrap-macos brew-bundle links tmux-plugins opencode-deps doctor
 
 bootstrap-macos:
 	./scripts/bootstrap-macos.sh
+
+brew-bundle:
+	brew bundle --file ./Brewfile
 
 links:
 	./scripts/install-home-links.sh
