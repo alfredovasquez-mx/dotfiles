@@ -7,7 +7,7 @@ background-opacity = 0.88
 background-blur = 8
 background-opacity-cells = false
 
-#macos-titlebar-style = hidden
+macos-titlebar-style = hidden
 macos-window-buttons = hidden
 
 # Font

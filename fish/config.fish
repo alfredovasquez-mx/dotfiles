@@ -18,6 +18,10 @@ alias kigo="cd /Users/alfredo.vasquez/dev/work/kigo"
 alias bits="cd /Users/alfredo.vasquez/dev/personal/c0deB1ts"
 alias avmx="cd /Users/alfredo.vasquez/dev/personal/alfredovasquez-mx"
 
+function kscanner
+    ssh kigo-scanner $argv
+end
+
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :
