@@ -1,75 +1,118 @@
 local glyphs = {
   F = {
-    "██████",
-    "██    ",
-    "█████ ",
-    "██    ",
-    "██    ",
+    "111111",
+    "110000",
+    "111110",
+    "110000",
+    "110000",
   },
   L = {
-    "██    ",
-    "██    ",
-    "██    ",
-    "██    ",
-    "██████",
+    "110000",
+    "110000",
+    "110000",
+    "110000",
+    "111111",
   },
   O = {
-    " ████ ",
-    "██  ██",
-    "██  ██",
-    "██  ██",
-    " ████ ",
+    "011110",
+    "110011",
+    "110011",
+    "110011",
+    "011110",
   },
   W = {
-    "██   ██",
-    "██   ██",
-    "██ █ ██",
-    "███████",
-    "██   ██",
+    "1100011",
+    "1100011",
+    "1101011",
+    "1111111",
+    "1100011",
   },
   C = {
-    " █████",
-    "██    ",
-    "██    ",
-    "██    ",
-    " █████",
+    "011111",
+    "110000",
+    "110000",
+    "110000",
+    "011111",
   },
   D = {
-    "█████ ",
-    "██  ██",
-    "██   ██",
-    "██  ██",
-    "█████ ",
+    "111110",
+    "110011",
+    "110011",
+    "110011",
+    "111110",
   },
   E = {
-    "██████",
-    "██    ",
-    "█████ ",
-    "██    ",
-    "██████",
+    "111111",
+    "110000",
+    "111110",
+    "110000",
+    "111111",
   },
 }
 
-local function build_word(word, gap)
-  local lines = {}
-  for row = 1, #glyphs.F do
-    local chars = {}
-    for i = 1, #word do
-      chars[#chars + 1] = glyphs[word:sub(i, i)][row]
-    end
-    lines[#lines + 1] = table.concat(chars, gap)
+local digraphs = {
+  DE = {
+    "1111100111111",
+    "1100110110000",
+    "1100110111110",
+    "1100110110000",
+    "1111100111111",
+  },
+}
+
+local function pixels_to_blocks(rows)
+  local rendered = {}
+  for i, row in ipairs(rows) do
+    rendered[i] = row:gsub("1", "█"):gsub("0", " ")
   end
-  return lines
+  return rendered
+end
+
+local function build_word(word, opts)
+  opts = opts or {}
+  local default_gap = opts.gap or 1
+  local rows = {}
+  local height = #glyphs.F
+
+  local segments = {}
+  local i = 1
+  while i <= #word do
+    local pair = word:sub(i, i + 1)
+    if #pair == 2 and digraphs[pair] then
+      table.insert(segments, digraphs[pair])
+      i = i + 2
+    else
+      table.insert(segments, glyphs[word:sub(i, i)])
+      i = i + 1
+    end
+  end
+
+  for row = 1, height do
+    rows[row] = segments[1][row]
+  end
+
+  local gap = string.rep("0", default_gap)
+  for segment_index = 2, #segments do
+    local segment = segments[segment_index]
+    for row = 1, height do
+      rows[row] = rows[row] .. gap .. segment[row]
+    end
+  end
+
+  return rows
 end
 
 local function build_header()
-  local flow = build_word("FLOW", " ")
-  local code = build_word("CODE", " ")
+  local flow = build_word("FLOW", { gap = 1 })
+  local code = build_word("CODE", { gap = 1 })
   local lines = {}
+  local word_gap = string.rep("0", 4)
+
   for i = 1, #flow do
-    lines[i] = flow[i] .. "    " .. code[i]
+    lines[i] = flow[i] .. word_gap .. code[i]
   end
-  return lines
+
+  return pixels_to_blocks(lines)
 end
 
 local header_lines = build_header()
@@ -92,7 +135,7 @@ local header = normalize_header(header_lines)
 local function set_dashboard_highlights()
   local groups = {
     SnacksDashboardNormal = { bg = "none" },
-    SnacksDashboardHeader = { fg = "#c4746e", bold = true },
+    SnacksDashboardHeader = { fg = "#c4746e", nocombine = true },
     SnacksDashboardFooter = { fg = "#87a987", italic = true },
     SnacksDashboardDesc = { fg = "#a6a69c" },
     SnacksDashboardIcon = { fg = "#b6927b" },

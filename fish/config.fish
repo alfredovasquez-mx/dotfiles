@@ -1,6 +1,11 @@
 if status is-interactive
 # Commands to run in interactive sessions can go here
 end
+fish_vi_key_bindings
+set fish_cursor_default block
+set fish_cursor_insert line
+set fish_cursor_replace_one underscore
+set fish_cursor_visual block
 starship init fish | source
 set -g fish_greeting
 direnv hook fish | source
@@ -29,6 +34,9 @@ source ~/.orbstack/shell/init2.fish 2>/dev/null || :
 
 # Added route for kiro-cli
 fish_add_path $HOME/.local/bin
+
+# zoxide initialization
+zoxide init fish | source
 
 # opencode
 fish_add_path /Users/alfredo.vasquez/.opencode/bin
