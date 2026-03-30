@@ -10,6 +10,7 @@ brew "starship"
 brew "fastfetch"
 
 # Shell and search utilities
+brew "carapace"
 brew "direnv"
 brew "fd"
 brew "fzf"
