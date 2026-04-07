@@ -1,0 +1,85 @@
+#:schema https://github.com/joshmedeski/sesh/raw/main/sesh.schema.json
+
+cache = true
+strict_mode = true
+separator_aware = true
+dir_length = 2
+sort_order = ["config", "tmux", "zoxide"]
+blacklist = ["codex-fish-test"]
+
+[default_session]
+windows = ["shell"]
+
+[[window]]
+name = "shell"
+
+[[window]]
+name = "editor"
+startup_script = "nvim ."
+
+[[window]]
+name = "git"
+startup_script = "lazygit"
+
+[[window]]
+name = "server"
+
+[[window]]
+name = "logs"
+
+[[window]]
+name = "infra"
+
+[[window]]
+name = "gateway"
+
+[[window]]
+name = "mobile-bff"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kigo-app-services/kigo-mobile-bff"
+
+[[window]]
+name = "payment-hub"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kigo-app-services/kigo-payment-hub"
+
+[[window]]
+name = "ghostty"
+path = "/Users/alfredo.vasquez/dev/personal/Alfredo/omerxx-dotfiles/ghostty"
+
+[[window]]
+name = "tmux"
+path = "/Users/alfredo.vasquez/dev/personal/Alfredo/omerxx-dotfiles/tmux"
+
+[[session]]
+name = "main"
+path = "/Users/alfredo.vasquez"
+windows = ["shell"]
+
+[[session]]
+name = "kigo-enforcement"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kigo-enforcement"
+windows = ["editor", "server", "logs", "git"]
+
+[[session]]
+name = "kigo-lpr-cams"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kigo-lpr/kigo-lpr-cams"
+windows = ["editor", "server", "infra", "git"]
+
+[[session]]
+name = "kigo-lpr-gateway"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kigo-lpr/kigo-lpr-gateway"
+windows = ["editor", "gateway", "logs", "git"]
+
+[[session]]
+name = "kipuve"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kipuve"
+windows = ["editor", "server", "infra", "git"]
+
+[[session]]
+name = "kigo-app-services"
+path = "/Users/alfredo.vasquez/dev/work/Kigo/kigo-app-services"
+windows = ["editor", "mobile-bff", "payment-hub", "git"]
+
+[[session]]
+name = "omerxx-dotfiles"
+path = "/Users/alfredo.vasquez/dev/personal/Alfredo/omerxx-dotfiles"
+windows = ["editor", "ghostty", "tmux", "git"]

@@ -24,7 +24,7 @@ local glyphs = {
     "11000011",
     "11000011",
     "11011011",
-    "11011011",
+    "11111111",
     "01100110",
   },
   C = {
@@ -48,15 +48,12 @@ local glyphs = {
     "110000",
     "111111",
   },
-}
-
-local digraphs = {
-  DE = {
-    "1111100111111",
-    "1100110110000",
-    "1100110111110",
-    "1100110110000",
-    "1111100111111",
+  [" "] = {
+    "0000",
+    "0000",
+    "0000",
+    "0000",
+    "0000",
   },
 }
 
@@ -72,19 +69,16 @@ local function build_word(word, opts)
   opts = opts or {}
   local default_gap = opts.gap or 1
   local rows = {}
-  local height = #glyphs.F
 
   local segments = {}
-  local i = 1
-  while i <= #word do
-    local pair = word:sub(i, i + 1)
-    if #pair == 2 and digraphs[pair] then
-      table.insert(segments, digraphs[pair])
-      i = i + 2
-    else
-      table.insert(segments, glyphs[word:sub(i, i)])
-      i = i + 1
-    end
+  for i = 1, #word do
+    local glyph = glyphs[word:sub(i, i)] or glyphs[" "]
+    table.insert(segments, glyph)
+  end
+
+  local height = #segments[1]
+  if #segments == 0 then
+    return rows
   end
 
   for row = 1, height do
@@ -103,16 +97,7 @@ local function build_word(word, opts)
 end
 
 local function build_header()
-  local flow = build_word("FLOW", { gap = 1 })
-  local code = build_word("CODE", { gap = 1 })
-  local lines = {}
-  local word_gap = string.rep("0", 4)
-
-  for i = 1, #flow do
-    lines[i] = flow[i] .. word_gap .. code[i]
-  end
-
-  return pixels_to_blocks(lines)
+  return pixels_to_blocks(build_word("FLOW CODE", { gap = 1 }))
 end
 
 local header_lines = build_header()

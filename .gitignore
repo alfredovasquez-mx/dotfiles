@@ -16,6 +16,8 @@
 !nvim/**
 !opencode/
 !opencode/**
+!sesh/
+!sesh/**
 !scripts/
 !scripts/**
 !tmux/

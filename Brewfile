@@ -6,12 +6,12 @@ tap "real-aazam/aazam"
 brew "fish"
 brew "neovim"
 brew "tmux"
+brew "sesh"
 brew "starship"
 brew "fastfetch"
 
 # Shell and search utilities
 brew "carapace"
-brew "direnv"
 brew "fd"
 brew "fzf"
 brew "lazygit"

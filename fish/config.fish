@@ -2,10 +2,10 @@ if status is-interactive
 # Commands to run in interactive sessions can go here
 end
 
+mise activate fish | source
 starship init fish | source
 source ~/.config/fish/functions/fish_mode_prompt.fish
 set -g fish_greeting
-direnv hook fish | source
 
 #kigo-tunnels scripts
 fish_add_path ~/bin
