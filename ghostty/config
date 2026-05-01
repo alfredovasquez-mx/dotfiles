@@ -22,7 +22,9 @@ adjust-cell-height = 1
 cursor-style = block
 cursor-style-blink = false
 cursor-opacity = 0.9
-custom-shader = shaders/cursor.glsl
+custom-shader = shaders/cursor_warp.glsl
+custom-shader = shaders/ripple_cursor.glsl
+custom-shader-animation = always
 
 
 # UI behavior

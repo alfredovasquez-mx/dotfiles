@@ -19,6 +19,8 @@ brew "ripgrep"
 brew "shfmt"
 brew "stylua"
 brew "tree-sitter"
+brew "imagemagick"
+brew "pngpaste"
 
 # Languages and runtimes
 brew "bun"

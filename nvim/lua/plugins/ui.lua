@@ -25,6 +25,11 @@ return {
       spec = {
         { "<leader>c", group = "code" },
         { "<leader>g", group = "git" },
+        {
+          "<leader>o",
+          group = "obsidian",
+          icon = { icon = "󰎚 ", color = "purple" },
+        },
         { "<leader>t", group = "test" },
         { "<leader>F", group = "flutter" },
       },

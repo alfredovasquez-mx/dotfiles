@@ -12,6 +12,8 @@ client_name="$($TMUX_BIN display-message -p '#{client_name}' 2>/dev/null)"
 title_override="${1:-}"
 path_override="${2:-}"
 current_cmd="$($TMUX_BIN display-message -p '#{pane_current_command}' 2>/dev/null)"
+window_state="$($TMUX_BIN display-message -p '#{@codex_sesh_state}' 2>/dev/null)"
+configured_cmd="$($TMUX_BIN display-message -p '#{@codex_sesh_cmd}' 2>/dev/null)"
 title_source="pane"
 
 if [ -n "$path_override" ]; then
@@ -28,7 +30,7 @@ else
   title_source="current"
 fi
 
-label="$("$HELPER" "$title" "$path" "$current_name" "$current_cmd" "$title_source")"
+label="$("$HELPER" "$title" "$path" "$current_name" "$current_cmd" "$title_source" "$window_state" "$configured_cmd")"
 [ -n "$label" ] || exit 0
 [ "$label" = "$current_name" ] && exit 0
 

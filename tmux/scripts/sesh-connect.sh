@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
+import shlex
 import subprocess
 import sys
 import time
@@ -9,17 +10,22 @@ from pathlib import Path
 CONFIG_FILE = Path("/Users/alfredo.vasquez/.config/sesh/sesh.toml")
 TMUX_BIN = "/opt/homebrew/bin/tmux"
 SESH_BIN = "/opt/homebrew/bin/sesh"
+FISH_BIN = "/opt/homebrew/bin/fish"
+RENAME_SCRIPT = "/Users/alfredo.vasquez/.config/tmux/scripts/rename-current-window.sh"
 BOOTSTRAP_FLAG = "@codex_sesh_bootstrap_done"
 WINDOW_CMD_OPT = "@codex_sesh_cmd"
 WINDOW_STATE_OPT = "@codex_sesh_state"
-PRELOAD_WINDOWS = {"nvim", "git"}
-BACKGROUND_WINDOWS = {"http", "sql", "ai", "docs"}
-LATE_BACKGROUND_WINDOWS = {"ai", "docs"}
+PRELOAD_WINDOWS = {"ai"}
+BACKGROUND_WINDOWS = {"git", "editor", "sql", "http"}
+LATE_BACKGROUND_WINDOWS = {"http"}
+PRELOAD_DELAY = {
+    "ai": 0.55,
+}
 BACKGROUND_DELAY = {
-    "http": 1.2,
-    "sql": 1.8,
-    "ai": 4.8,
-    "docs": 6.2,
+    "git": 1.0,
+    "editor": 1.6,
+    "sql": 2.2,
+    "http": 3.6,
 }
 
 
@@ -199,10 +205,42 @@ def get_window_option(target: str, index: str, option: str) -> str:
     return (proc.stdout or "").strip()
 
 
-def wake_and_run(pane_target: str, command: str):
-    time.sleep(0.45)
+def startup_delay(name: str) -> float:
+    if name in PRELOAD_WINDOWS:
+        return PRELOAD_DELAY.get(name, 0.0)
+    return BACKGROUND_DELAY.get(name, 0.0)
+
+
+def build_window_shell_command(name: str, startup_script: str) -> str:
+    if not startup_script:
+        return ""
+
+    delay = startup_delay(name)
+    fish_inner_parts = []
+    if delay > 0:
+        fish_inner_parts.append(f"sleep {delay}")
+    fish_inner_parts.append(
+        f'{shlex.quote(TMUX_BIN)} set-window-option {shlex.quote(WINDOW_STATE_OPT)} starting >/dev/null 2>&1 || true'
+    )
+    fish_inner_parts.append(
+        f'{shlex.quote(RENAME_SCRIPT)} {shlex.quote(startup_script)} "$PWD" >/dev/null 2>&1 || true'
+    )
+    fish_inner_parts.append(
+        f'{shlex.quote(TMUX_BIN)} set-window-option {shlex.quote(WINDOW_STATE_OPT)} done >/dev/null 2>&1 || true'
+    )
+    fish_inner_parts.append(
+        f'{shlex.quote(TMUX_BIN)} refresh-client -S >/dev/null 2>&1 || true'
+    )
+    fish_inner_parts.append(startup_script)
+    fish_inner_parts.append(f"exec {shlex.quote(FISH_BIN)} -il")
+    fish_inner = "; ".join(fish_inner_parts)
+    return f'{shlex.quote(FISH_BIN)} -lc {shlex.quote(fish_inner)}'
+
+
+def wake_and_run(pane_target: str, command: str, enter_delay: float = 0.45, command_delay: float = 0.6):
+    time.sleep(enter_delay)
     run(TMUX_BIN, "send-keys", "-t", pane_target, "Enter")
-    time.sleep(0.6)
+    time.sleep(command_delay)
     if command:
         run(TMUX_BIN, "send-keys", "-t", pane_target, command, "Enter")
 
@@ -227,7 +265,7 @@ def start_window(target: str, index: str, delay: float = 0.0):
     run(TMUX_BIN, "wait-for", "-L", lock_name)
     try:
         state = get_window_option(target, index, WINDOW_STATE_OPT)
-        if state not in {"pending-bg", "pending-late", "pending-lazy"}:
+        if state not in {"pending-preload", "pending-bg", "pending-late", "pending-lazy"}:
             return 0
 
         command = get_window_option(target, index, WINDOW_CMD_OPT)
@@ -269,18 +307,16 @@ def bootstrap_session(target: str):
         set_session_flag(target, "1")
         return 0
 
-    time.sleep(0.8)
-    window_targets = []
-
+    time.sleep(0.2)
     for idx, win in enumerate(windows, start=1):
+        command = win.get("startup_script", "")
         if idx == 1:
-            pane_target = f"{target}:1.1"
             window_index = "1"
-            run(TMUX_BIN, "rename-window", "-t", f"{target}:1", win["name"])
         else:
-            proc = run(
+            proc_args = [
                 TMUX_BIN,
                 "new-window",
+                "-d",
                 "-P",
                 "-F",
                 "#{window_index}",
@@ -290,13 +326,15 @@ def bootstrap_session(target: str):
                 win["name"],
                 "-c",
                 win["path"],
-                capture=True,
-            )
+            ]
+            if command:
+                proc_args.append(build_window_shell_command(win["name"], command))
+            proc = run(*proc_args, capture=True)
             window_index = proc.stdout.strip()
-            pane_target = f"{target}:{window_index}.1"
 
-        command = win.get("startup_script", "")
-        if win["name"] in PRELOAD_WINDOWS:
+        if not command:
+            state = "done"
+        elif win["name"] in PRELOAD_WINDOWS:
             state = "pending-preload"
         elif win["name"] in LATE_BACKGROUND_WINDOWS:
             state = "pending-late"
@@ -307,21 +345,6 @@ def bootstrap_session(target: str):
 
         set_window_option(target, window_index, WINDOW_CMD_OPT, command)
         set_window_option(target, window_index, WINDOW_STATE_OPT, state)
-        window_targets.append((window_index, win["name"], pane_target, command))
-
-    run(TMUX_BIN, "select-window", "-t", f"{target}:1")
-
-    for window_index, name, pane_target, command in window_targets:
-        if name in PRELOAD_WINDOWS:
-            set_window_option(target, window_index, WINDOW_STATE_OPT, "starting")
-            wake_and_run(pane_target, command)
-            set_window_option(target, window_index, WINDOW_STATE_OPT, "done")
-            time.sleep(0.15)
-
-    for window_index, name, _, _ in window_targets:
-        if name in BACKGROUND_WINDOWS:
-            delay = BACKGROUND_DELAY.get(name, 1.2)
-            spawn_window_start(target, window_index, delay=delay)
     set_session_flag(target, "1")
     return 0
 
@@ -371,9 +394,31 @@ def main():
     if not session or not session.get("path"):
         os.execv(SESH_BIN, [SESH_BIN, "connect", target])
 
-    run(TMUX_BIN, "new-session", "-d", "-s", target, "-c", session["path"])
-    if session.get("windows"):
-        run(TMUX_BIN, "rename-window", "-t", f"{target}:1", session["windows"][0]["name"])
+    first_window = session.get("windows", [{}])[0] if session.get("windows") else None
+    if first_window and first_window.get("name"):
+        first_command = first_window.get("startup_script", "")
+        new_session_args = [
+            TMUX_BIN,
+            "new-session",
+            "-d",
+            "-s",
+            target,
+            "-n",
+            first_window["name"],
+            "-c",
+            first_window.get("path") or session["path"],
+        ]
+        if first_command:
+            new_session_args.append(build_window_shell_command(first_window["name"], first_command))
+        run(*new_session_args)
+        if first_command:
+            first_state = "pending-preload" if first_window["name"] in PRELOAD_WINDOWS else "pending-lazy"
+        else:
+            first_state = "done"
+        set_window_option(target, "1", WINDOW_CMD_OPT, first_command)
+        set_window_option(target, "1", WINDOW_STATE_OPT, first_state)
+    else:
+        run(TMUX_BIN, "new-session", "-d", "-s", target, "-c", session["path"])
 
     spawn_bootstrap(target)
     switch_or_attach(target)

@@ -39,7 +39,7 @@ function __codex_tmux_window_should_rename_preexec --argument-names cmdline
     end
 
     switch $primary
-        case nvim vim vi lazygit gitui atac rainfrog opencode ssh mosh yazi lf ranger k9s htop btop top
+        case nvim vim vi git lazygit gitui atac rainfrog pi opencode ssh mosh yazi lf ranger k9s htop btop top
             return 0
     end
 
